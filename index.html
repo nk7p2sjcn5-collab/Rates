@@ -28,7 +28,7 @@
       padding: 20px;
     }
 
-    /* Outer Paper Card Container */
+    /* Card Container */
     .rate-card {
       background-color: var(--card-bg);
       width: 100%;
@@ -93,7 +93,7 @@
       gap: 12px;
     }
 
-    /* Clean Vector Gold & Silver Bar Graphics */
+    /* Vector Bar Logos */
     .bar-icon {
       width: 32px;
       height: 22px;
@@ -109,7 +109,7 @@
       letter-spacing: 0.5px;
     }
 
-    /* Footer Info */
+    /* Footer Status Bar */
     .footer-bar {
       margin-top: 20px;
       display: flex;
@@ -147,29 +147,21 @@
         </tr>
       </thead>
       <tbody id="rate-rows">
-        <!-- Rows will be injected dynamically from Google Sheet CSV -->
+        <!-- Live rows injected here -->
       </tbody>
     </table>
 
     <div class="footer-bar">
       <span>Auto-updated from Google Sheet</span>
-      <span class="status-tag" id="last-updated">Status: Live</span>
+      <span class="status-tag" id="last-updated">Status: Connecting...</span>
     </div>
   </div>
 
   <script>
-    // CSV URL generated from Google Sheets "Publish to Web"
-    const SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vT-PLACEHOLDER/pub?output=csv';
+    // Direct CSV export link using your sheet ID
+    const SHEET_ID = '15orLKgGD4GX_6TfTjChx1WxtfTXL3_JWqpLfih_NjSs';
+    const SHEET_CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv`;
 
-    // Sample fallback data based on your Google Sheet entries
-    const fallbackData = [
-      { date: '2083-5-12', metal: 'Gold', gm10: '2,78,000/-', tola1: '3,22,000/-' },
-      { date: '2083-5-12', metal: 'Silver', gm10: '4,189/-', tola1: '4,800/-' },
-      { date: '2083-5-11', metal: 'Gold', gm10: '2,75,600/-', tola1: '3,20,000/-' },
-      { date: '2083-5-11', metal: 'Silver', gm10: '4,287/-', tola1: '4,900/-' }
-    ];
-
-    // Inline SVG graphics for Gold and Silver Bars matching your reference images
     const goldBarSVG = `
       <svg class="bar-icon" viewBox="0 0 64 44" fill="none" xmlns="http://www.w3.org/2000/svg">
         <path d="M14 8L50 8L60 26L24 26L14 8Z" fill="#FFD700" stroke="#1A1A1A" stroke-width="3" stroke-linejoin="round"/>
@@ -190,11 +182,18 @@
       </svg>
     `;
 
+    function formatNumber(val) {
+      if (!val) return '';
+      const cleanVal = val.toString().replace(/[^0-9.]/g, '');
+      if (!cleanVal) return val;
+      const num = parseFloat(cleanVal);
+      return isNaN(num) ? val : num.toLocaleString('en-IN');
+    }
+
     function renderTable(data) {
       const tbody = document.getElementById('rate-rows');
       tbody.innerHTML = '';
 
-      // Group rows by date to apply row-span for date column
       const groupedByDate = {};
       data.forEach(item => {
         if (!groupedByDate[item.date]) groupedByDate[item.date] = [];
@@ -206,7 +205,6 @@
         items.forEach((row, index) => {
           const tr = document.createElement('tr');
 
-          // Date cell spans across all metals for that date
           if (index === 0) {
             const dateTd = document.createElement('td');
             dateTd.className = 'date-cell';
@@ -217,18 +215,19 @@
 
           const metalTd = document.createElement('td');
           metalTd.className = 'metal-cell';
-          
           const isGold = row.metal.toLowerCase().includes('gold');
           const icon = isGold ? goldBarSVG : silverBarSVG;
           metalTd.innerHTML = `${icon} <span>${row.metal}</span>`;
 
           const gm10Td = document.createElement('td');
           gm10Td.className = 'price-cell';
-          gm10Td.textContent = row.gm10.includes('/-') ? row.gm10 : `${row.gm10}/-`;
+          const fmtGm10 = formatNumber(row.gm10);
+          gm10Td.textContent = fmtGm10.includes('/-') ? fmtGm10 : `${fmtGm10}/-`;
 
           const tola1Td = document.createElement('td');
           tola1Td.className = 'price-cell';
-          tola1Td.textContent = row.tola1.includes('/-') ? row.tola1 : `${row.tola1}/-`;
+          const fmtTola1 = formatNumber(row.tola1);
+          tola1Td.textContent = fmtTola1.includes('/-') ? fmtTola1 : `${fmtTola1}/-`;
 
           tr.appendChild(metalTd);
           tr.appendChild(gm10Td);
@@ -241,37 +240,53 @@
 
     async function loadRates() {
       try {
-        const res = await fetch(SHEET_CSV_URL);
-        if (!res.ok) throw new Error('Sheet not accessible');
-        const text = await res.text();
-        const lines = text.split('\n').map(l => l.trim()).filter(l => l);
+        // Cache buster guarantees fresh sheet fetch every time
+        const response = await fetch(`${SHEET_CSV_URL}&_=${Date.now()}`);
+        if (!response.ok) throw new Error('Sheet network error');
         
-        // Parse CSV data starting after header
+        const csvText = await response.text();
+        const lines = csvText.split('\n').map(l => l.trim()).filter(l => l);
+
         const parsedData = [];
         let currentDate = '';
 
-        for (let i = 1; i < lines.length; i++) {
-          const cols = lines[i].split(',').map(c => c.trim());
-          if (cols[0] && cols[0].includes('-')) currentDate = cols[0];
+        for (let i = 0; i < lines.length; i++) {
+          const cols = lines[i].split(',').map(c => c.trim().replace(/^"|"$/g, ''));
           
-          parsedData.push({
-            date: currentDate || cols[0],
-            metal: cols[1] || cols[0],
-            gm10: cols[2],
-            tola1: cols[3]
-          });
+          // Skip main title row if present
+          if (cols[0] && cols[0].toUpperCase().includes('GOLD & SILVER')) continue;
+          // Skip column headers
+          if (cols[0] && cols[0].toUpperCase() === 'DATE') continue;
+
+          if (cols[0] && cols[0].includes('-')) {
+            currentDate = cols[0];
+          }
+
+          if (cols[1] && (cols[1].toUpperCase().includes('GOLD') || cols[1].toUpperCase().includes('SILVER'))) {
+            parsedData.push({
+              date: currentDate,
+              metal: cols[1].trim(),
+              gm10: cols[2] || '',
+              tola1: cols[3] || ''
+            });
+          }
         }
 
-        renderTable(parsedData);
-        document.getElementById('last-updated').textContent = 'Status: Updated Live';
+        if (parsedData.length > 0) {
+          renderTable(parsedData);
+          document.getElementById('last-updated').textContent = 'Status: Live';
+        } else {
+          throw new Error('No valid data parsed');
+        }
       } catch (err) {
-        // Fallback rendering if published CSV link is not configured yet
-        renderTable(fallbackData);
-        document.getElementById('last-updated').textContent = 'Status: Showing Saved Data';
+        console.error(err);
+        document.getElementById('last-updated').textContent = 'Status: Check Sheet Sharing Permissions';
       }
     }
 
     loadRates();
+    // Auto refresh rate data every 30 seconds
+    setInterval(loadRates, 30000);
   </script>
 </body>
 </html>
