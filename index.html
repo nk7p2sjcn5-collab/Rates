@@ -10,8 +10,6 @@
       --ink-black: #1a1a1a;
       --table-border: #222222;
       --card-shadow: 0 10px 25px rgba(0,0,0,0.15);
-      --gold-color: #d4af37;
-      --silver-color: #718096;
     }
 
     * {
@@ -92,12 +90,16 @@
       padding-left: 20px !important;
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 12px;
     }
 
-    .metal-icon {
-      font-size: 1.3rem;
+    /* Clean Vector Gold & Silver Bar Graphics */
+    .bar-icon {
+      width: 32px;
+      height: 22px;
       display: inline-block;
+      vertical-align: middle;
+      flex-shrink: 0;
     }
 
     .price-cell {
@@ -167,6 +169,27 @@
       { date: '2083-5-11', metal: 'Silver', gm10: '4,287/-', tola1: '4,900/-' }
     ];
 
+    // Inline SVG graphics for Gold and Silver Bars matching your reference images
+    const goldBarSVG = `
+      <svg class="bar-icon" viewBox="0 0 64 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M14 8L50 8L60 26L24 26L14 8Z" fill="#FFD700" stroke="#1A1A1A" stroke-width="3" stroke-linejoin="round"/>
+        <path d="M4 26L24 26L14 8L4 26Z" fill="#FFC107" stroke="#1A1A1A" stroke-width="3" stroke-linejoin="round"/>
+        <path d="M4 26L24 26L24 38L4 38Z" fill="#FFB300" stroke="#1A1A1A" stroke-width="3" stroke-linejoin="round"/>
+        <path d="M24 26L60 26L60 38L24 38Z" fill="#FFD700" stroke="#1A1A1A" stroke-width="3" stroke-linejoin="round"/>
+        <path d="M18 14L46 14" stroke="#FFF" stroke-width="2" stroke-linecap="round" opacity="0.6"/>
+      </svg>
+    `;
+
+    const silverBarSVG = `
+      <svg class="bar-icon" viewBox="0 0 64 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M14 8L50 8L60 26L24 26L14 8Z" fill="#E0E0E0" stroke="#1A1A1A" stroke-width="3" stroke-linejoin="round"/>
+        <path d="M4 26L24 26L14 8L4 26Z" fill="#BDBDBD" stroke="#1A1A1A" stroke-width="3" stroke-linejoin="round"/>
+        <path d="M4 26L24 26L24 38L4 38Z" fill="#9E9E9E" stroke="#1A1A1A" stroke-width="3" stroke-linejoin="round"/>
+        <path d="M24 26L60 26L60 38L24 38Z" fill="#EEEEEE" stroke="#1A1A1A" stroke-width="3" stroke-linejoin="round"/>
+        <path d="M18 14L46 14" stroke="#FFF" stroke-width="2" stroke-linecap="round" opacity="0.8"/>
+      </svg>
+    `;
+
     function renderTable(data) {
       const tbody = document.getElementById('rate-rows');
       tbody.innerHTML = '';
@@ -195,10 +218,9 @@
           const metalTd = document.createElement('td');
           metalTd.className = 'metal-cell';
           
-          // Determine gold bar icon vs silver bar icon
           const isGold = row.metal.toLowerCase().includes('gold');
-          const barIcon = isGold ? '🟨' : '⬜';
-          metalTd.innerHTML = `<span class="metal-icon">${barIcon}</span> ${row.metal}`;
+          const icon = isGold ? goldBarSVG : silverBarSVG;
+          metalTd.innerHTML = `${icon} <span>${row.metal}</span>`;
 
           const gm10Td = document.createElement('td');
           gm10Td.className = 'price-cell';
