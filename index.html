@@ -6,11 +6,12 @@
   <title>Prakash Jyasa Pasa - Gold & Silver Rates</title>
   <style>
     :root {
-      --yellow-bg: #fadc41;
-      --paper-yellow: #fce868;
+      --card-bg: #ffffff;
       --ink-black: #1a1a1a;
       --table-border: #222222;
       --card-shadow: 0 10px 25px rgba(0,0,0,0.15);
+      --gold-color: #d4af37;
+      --silver-color: #718096;
     }
 
     * {
@@ -31,13 +32,13 @@
 
     /* Outer Paper Card Container */
     .rate-card {
-      background-color: var(--yellow-bg);
+      background-color: var(--card-bg);
       width: 100%;
       max-width: 800px;
       padding: 30px;
       border-radius: 8px;
       box-shadow: var(--card-shadow);
-      border: 2px solid #e0c228;
+      border: 2px solid #e0e0e0;
     }
 
     /* Shop Header */
@@ -82,13 +83,21 @@
     .date-cell {
       font-weight: 700;
       font-size: 1.2rem;
-      background-color: rgba(255, 255, 255, 0.2);
+      background-color: rgba(0, 0, 0, 0.02);
     }
 
     .metal-cell {
       font-weight: 700;
       text-align: left !important;
-      padding-left: 24px !important;
+      padding-left: 20px !important;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .metal-icon {
+      font-size: 1.3rem;
+      display: inline-block;
     }
 
     .price-cell {
@@ -185,7 +194,11 @@
 
           const metalTd = document.createElement('td');
           metalTd.className = 'metal-cell';
-          metalTd.textContent = row.metal;
+          
+          // Determine gold bar icon vs silver bar icon
+          const isGold = row.metal.toLowerCase().includes('gold');
+          const barIcon = isGold ? '🟨' : '⬜';
+          metalTd.innerHTML = `<span class="metal-icon">${barIcon}</span> ${row.metal}`;
 
           const gm10Td = document.createElement('td');
           gm10Td.className = 'price-cell';
