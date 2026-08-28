@@ -6,11 +6,13 @@
   <title>प्रकाश ज्यास पसः - सुन र चाँदीको दर</title>
   <style>
     :root {
-      --card-bg: #ffffff;
-      --ink-black: #1a1a1a;
-      --table-border: #222222;
-      --card-shadow: 0 10px 25px rgba(0,0,0,0.15);
-      --gold-solid: #C59B27; /* Deep rich solid gold */
+      --bg-cream: #F5F1E6;
+      --card-bg: #FAF7F0;
+      --gold-primary: #9C7A3C;
+      --gold-border: #B89754;
+      --table-border: #706F6D;
+      --header-bg: #EFE8D8;
+      --text-dark: #2B2A28;
     }
 
     * {
@@ -21,7 +23,7 @@
     }
 
     body {
-      background-color: #2c2c2e;
+      background-color: #2b2b2b;
       display: flex;
       justify-content: center;
       align-items: center;
@@ -29,32 +31,87 @@
       padding: 20px;
     }
 
-    /* Card Container */
+    /* Outer Card Frame */
     .rate-card {
       background-color: var(--card-bg);
       width: 100%;
-      max-width: 800px;
-      padding: 30px;
-      border-radius: 8px;
-      box-shadow: var(--card-shadow);
-      border: 2px solid #e0e0e0;
+      max-width: 850px;
+      padding: 35px 30px 25px 30px;
+      position: relative;
+      border: 1px solid var(--gold-border);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    }
+
+    /* Inner Double-Border Effect */
+    .rate-card::before {
+      content: "";
+      position: absolute;
+      top: 6px;
+      left: 6px;
+      right: 6px;
+      bottom: 6px;
+      border: 1px solid var(--gold-border);
+      pointer-events: none;
+    }
+
+    /* Top Decorative Line with Diamond Star */
+    .top-divider {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 25px;
+      position: relative;
+    }
+
+    .top-divider::before,
+    .top-divider::after {
+      content: "";
+      flex: 1;
+      height: 1px;
+      background-color: var(--gold-border);
+    }
+
+    .top-divider .diamond {
+      color: var(--gold-primary);
+      font-size: 1.4rem;
+      padding: 0 15px;
+      line-height: 1;
+    }
+
+    /* Corner Top Left L-Bracket Accent */
+    .corner-bracket {
+      position: absolute;
+      top: 15px;
+      left: 15px;
+      width: 20px;
+      height: 20px;
+      border-top: 3px solid var(--text-dark);
+      border-left: 3px solid var(--text-dark);
     }
 
     /* Shop Header */
     .header {
       text-align: center;
-      margin-bottom: 25px;
-      border-bottom: 3px solid var(--gold-solid);
-      padding-bottom: 12px;
+      margin-bottom: 30px;
+      position: relative;
     }
 
-    /* Solid Bold Golden Title */
     .header h1 {
-      font-size: 2.8rem;
+      font-size: 3rem;
       font-weight: 900;
-      color: var(--gold-solid);
-      text-shadow: 1px 1px 0px #8C6D18, 0px 2px 4px rgba(0, 0, 0, 0.2);
-      letter-spacing: 0.5px;
+      color: var(--gold-primary);
+      letter-spacing: 1px;
+      text-shadow: 0.5px 0.5px 0px rgba(0,0,0,0.1);
+    }
+
+    .header::after {
+      content: "";
+      display: block;
+      width: 100%;
+      height: 2px;
+      background-color: var(--gold-border);
+      margin: 15px auto 0 auto;
+      box-shadow: 0 1px 0 rgba(255,255,255,0.8);
     }
 
     /* Grid Table Layout */
@@ -62,69 +119,57 @@
       width: 100%;
       border-collapse: collapse;
       background-color: transparent;
+      border: 3px solid var(--table-border);
     }
 
     .rate-table th, 
     .rate-table td {
       border: 2px solid var(--table-border);
-      padding: 14px 18px;
+      padding: 14px 12px;
       text-align: center;
-      color: var(--ink-black);
+      color: var(--text-dark);
+      font-size: 1.5rem;
     }
 
     .rate-table th {
-      font-size: 1.4rem;
-      font-weight: 700;
-      background-color: rgba(0, 0, 0, 0.04);
+      font-size: 1.6rem;
+      font-weight: 800;
+      background-color: var(--header-bg);
+      border-bottom: 3px solid var(--gold-border);
     }
 
-    /* Date font styling */
+    /* Cells Styling */
     .date-cell {
-      font-weight: 800;
-      font-size: 1.4rem;
-      background-color: rgba(0, 0, 0, 0.02);
+      font-weight: 900;
+      font-size: 1.55rem;
+      background-color: transparent;
+      vertical-align: middle;
     }
 
     .metal-cell {
-      font-weight: 700;
-      font-size: 1.3rem;
-      text-align: left !important;
-      padding-left: 20px !important;
-      display: flex;
-      align-items: center;
-      gap: 12px;
+      font-weight: 800;
+      font-size: 1.5rem;
     }
 
-    /* Vector Bar Logos */
-    .bar-icon {
-      width: 32px;
-      height: 22px;
-      display: inline-block;
-      vertical-align: middle;
-      flex-shrink: 0;
-    }
-
-    /* Big & bold price numbers */
     .price-cell {
       font-weight: 900;
-      font-size: 1.65rem;
+      font-size: 1.6rem;
       letter-spacing: 0.5px;
     }
 
     /* Footer Status Bar */
     .footer-bar {
-      margin-top: 20px;
+      margin-top: 15px;
       display: flex;
       justify-content: flex-end;
       align-items: center;
-      padding-top: 10px;
     }
 
     .status-tag {
       font-size: 0.85rem;
       font-weight: 600;
-      color: #444;
-      background: rgba(0,0,0,0.06);
+      color: #555;
+      background: rgba(0,0,0,0.04);
       padding: 4px 10px;
       border-radius: 4px;
     }
@@ -133,6 +178,12 @@
 <body>
 
   <div class="rate-card">
+    <div class="corner-bracket"></div>
+
+    <div class="top-divider">
+      <span class="diamond">✦</span>
+    </div>
+
     <div class="header">
       <h1>प्रकाश ज्यास पसः</h1>
     </div>
@@ -160,26 +211,6 @@
     const SHEET_ID = '15orLKgGD4GX_6TfTjChx1WxtfTXL3_JWqpLfih_NjSs';
     const SHEET_CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv`;
 
-    const goldBarSVG = `
-      <svg class="bar-icon" viewBox="0 0 64 44" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M14 8L50 8L60 26L24 26L14 8Z" fill="#FFD700" stroke="#1A1A1A" stroke-width="3" stroke-linejoin="round"/>
-        <path d="M4 26L24 26L14 8L4 26Z" fill="#FFC107" stroke="#1A1A1A" stroke-width="3" stroke-linejoin="round"/>
-        <path d="M4 26L24 26L24 38L4 38Z" fill="#FFB300" stroke="#1A1A1A" stroke-width="3" stroke-linejoin="round"/>
-        <path d="M24 26L60 26L60 38L24 38Z" fill="#FFD700" stroke="#1A1A1A" stroke-width="3" stroke-linejoin="round"/>
-        <path d="M18 14L46 14" stroke="#FFF" stroke-width="2" stroke-linecap="round" opacity="0.6"/>
-      </svg>
-    `;
-
-    const silverBarSVG = `
-      <svg class="bar-icon" viewBox="0 0 64 44" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M14 8L50 8L60 26L24 26L14 8Z" fill="#E0E0E0" stroke="#1A1A1A" stroke-width="3" stroke-linejoin="round"/>
-        <path d="M4 26L24 26L14 8L4 26Z" fill="#BDBDBD" stroke="#1A1A1A" stroke-width="3" stroke-linejoin="round"/>
-        <path d="M4 26L24 26L24 38L4 38Z" fill="#9E9E9E" stroke="#1A1A1A" stroke-width="3" stroke-linejoin="round"/>
-        <path d="M24 26L60 26L60 38L24 38Z" fill="#EEEEEE" stroke="#1A1A1A" stroke-width="3" stroke-linejoin="round"/>
-        <path d="M18 14L46 14" stroke="#FFF" stroke-width="2" stroke-linecap="round" opacity="0.8"/>
-      </svg>
-    `;
-
     // Converts English numbers (0-9) to Nepali numerals (०-९)
     function toNepaliDigits(inputStr) {
       if (!inputStr) return '';
@@ -204,7 +235,7 @@
       if (isNaN(num)) return toNepaliDigits(val);
 
       const formattedNum = num.toLocaleString('ne-NP');
-      return `${formattedNum}/–`;
+      return `${formattedNum}/-`;
     }
 
     function renderTable(data) {
@@ -231,12 +262,10 @@
           }
 
           const metalName = translateMetal(row.metal);
-          const isGold = metalName === 'सुन';
-          const icon = isGold ? goldBarSVG : silverBarSVG;
 
           const metalTd = document.createElement('td');
           metalTd.className = 'metal-cell';
-          metalTd.innerHTML = `${icon} <span>${metalName}</span>`;
+          metalTd.textContent = metalName;
 
           const gm10Td = document.createElement('td');
           gm10Td.className = 'price-cell';
