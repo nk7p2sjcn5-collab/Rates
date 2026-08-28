@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ne">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Prakash Jyasa Pasa - Gold & Silver Rates</title>
+  <title>प्रकाश ज्यासा पास - सुन र चाँदीको दर</title>
   <style>
     :root {
       --card-bg: #ffffff;
@@ -16,7 +16,7 @@
       box-sizing: border-box;
       margin: 0;
       padding: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Mukta", "Kalimati", sans-serif;
     }
 
     body {
@@ -48,10 +48,9 @@
     }
 
     .header h1 {
-      font-size: 2.4rem;
+      font-size: 2.5rem;
       font-weight: 800;
       color: var(--ink-black);
-      text-transform: capitalize;
       letter-spacing: 0.5px;
     }
 
@@ -68,19 +67,19 @@
       padding: 14px 18px;
       text-align: center;
       color: var(--ink-black);
-      font-size: 1.25rem;
+      font-size: 1.3rem;
       font-weight: 600;
     }
 
     .rate-table th {
-      font-size: 1.35rem;
+      font-size: 1.4rem;
       font-weight: 700;
       background-color: rgba(0, 0, 0, 0.04);
     }
 
     .date-cell {
       font-weight: 700;
-      font-size: 1.2rem;
+      font-size: 1.25rem;
       background-color: rgba(0, 0, 0, 0.02);
     }
 
@@ -103,7 +102,6 @@
     }
 
     .price-cell {
-      font-family: 'Courier New', Courier, monospace;
       font-weight: 800;
       font-size: 1.4rem;
       letter-spacing: 0.5px;
@@ -134,31 +132,30 @@
 
   <div class="rate-card">
     <div class="header">
-      <h1>Prakash Jyasa Pasa</h1>
+      <h1>प्रकाश ज्यासा पास</h1>
     </div>
 
     <table class="rate-table">
       <thead>
         <tr>
-          <th>Date</th>
-          <th>Metal</th>
-          <th>10 gm</th>
-          <th>1 Tola</th>
+          <th>मिती</th>
+          <th>धातु</th>
+          <th>१० ग्राम</th>
+          <th>१ तोला</th>
         </tr>
       </thead>
       <tbody id="rate-rows">
-        <!-- Live rows injected here -->
+        <!-- Dynamic Nepali rows loaded here -->
       </tbody>
     </table>
 
     <div class="footer-bar">
-      <span>Auto-updated from Google Sheet</span>
-      <span class="status-tag" id="last-updated">Status: Connecting...</span>
+      <span>गूगल शिटबाट स्वत: अपडेट हुन्छ</span>
+      <span class="status-tag" id="last-updated">स्थिति: जोड्दैछ...</span>
     </div>
   </div>
 
   <script>
-    // Direct CSV export link using your sheet ID
     const SHEET_ID = '15orLKgGD4GX_6TfTjChx1WxtfTXL3_JWqpLfih_NjSs';
     const SHEET_CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv`;
 
@@ -182,12 +179,32 @@
       </svg>
     `;
 
-    function formatNumber(val) {
+    // Converts English numbers (0-9) to Nepali numerals (०-९)
+    function toNepaliDigits(inputStr) {
+      if (!inputStr) return '';
+      const englishToNepali = {'0':'०', '1':'१', '2':'२', '3':'३', '4':'४', '5':'५', '6':'६', '7':'७', '8':'८', '9':'९'};
+      return inputStr.toString().replace(/[0-9]/g, digit => englishToNepali[digit]);
+    }
+
+    // Translates metal names to Nepali if entered in English on Google Sheet
+    function translateMetal(metalStr) {
+      const lower = metalStr.toLowerCase();
+      if (lower.includes('gold') || lower.includes('सुन')) return 'सुन';
+      if (lower.includes('silver') || lower.includes('चाँदी') || lower.includes('चादि')) return 'चाँदी';
+      return metalStr;
+    }
+
+    function formatNepaliPrice(val) {
       if (!val) return '';
       const cleanVal = val.toString().replace(/[^0-9.]/g, '');
-      if (!cleanVal) return val;
+      if (!cleanVal) return toNepaliDigits(val);
+      
       const num = parseFloat(cleanVal);
-      return isNaN(num) ? val : num.toLocaleString('en-IN');
+      if (isNaN(num)) return toNepaliDigits(val);
+
+      // Formats numbers according to Nepali/South Asian system (thousands, lakhs, crores)
+      const formattedNum = num.toLocaleString('ne-NP');
+      return `${formattedNum}/–`;
     }
 
     function renderTable(data) {
@@ -209,25 +226,25 @@
             const dateTd = document.createElement('td');
             dateTd.className = 'date-cell';
             dateTd.rowSpan = items.length;
-            dateTd.textContent = date;
+            dateTd.textContent = toNepaliDigits(date);
             tr.appendChild(dateTd);
           }
 
+          const metalName = translateMetal(row.metal);
+          const isGold = metalName === 'सुन';
+          const icon = isGold ? goldBarSVG : silverBarSVG;
+
           const metalTd = document.createElement('td');
           metalTd.className = 'metal-cell';
-          const isGold = row.metal.toLowerCase().includes('gold');
-          const icon = isGold ? goldBarSVG : silverBarSVG;
-          metalTd.innerHTML = `${icon} <span>${row.metal}</span>`;
+          metalTd.innerHTML = `${icon} <span>${metalName}</span>`;
 
           const gm10Td = document.createElement('td');
           gm10Td.className = 'price-cell';
-          const fmtGm10 = formatNumber(row.gm10);
-          gm10Td.textContent = fmtGm10.includes('/-') ? fmtGm10 : `${fmtGm10}/-`;
+          gm10Td.textContent = formatNepaliPrice(row.gm10);
 
           const tola1Td = document.createElement('td');
           tola1Td.className = 'price-cell';
-          const fmtTola1 = formatNumber(row.tola1);
-          tola1Td.textContent = fmtTola1.includes('/-') ? fmtTola1 : `${fmtTola1}/-`;
+          tola1Td.textContent = formatNepaliPrice(row.tola1);
 
           tr.appendChild(metalTd);
           tr.appendChild(gm10Td);
@@ -240,9 +257,8 @@
 
     async function loadRates() {
       try {
-        // Cache buster guarantees fresh sheet fetch every time
         const response = await fetch(`${SHEET_CSV_URL}&_=${Date.now()}`);
-        if (!response.ok) throw new Error('Sheet network error');
+        if (!response.ok) throw new Error('Network response was not ok');
         
         const csvText = await response.text();
         const lines = csvText.split('\n').map(l => l.trim()).filter(l => l);
@@ -253,16 +269,14 @@
         for (let i = 0; i < lines.length; i++) {
           const cols = lines[i].split(',').map(c => c.trim().replace(/^"|"$/g, ''));
           
-          // Skip main title row if present
-          if (cols[0] && cols[0].toUpperCase().includes('GOLD & SILVER')) continue;
-          // Skip column headers
-          if (cols[0] && cols[0].toUpperCase() === 'DATE') continue;
+          if (cols[0] && cols[0].toUpperCase().includes('GOLD')) continue;
+          if (cols[0] && (cols[0].toUpperCase() === 'DATE' || cols[0] === 'मिती')) continue;
 
           if (cols[0] && cols[0].includes('-')) {
             currentDate = cols[0];
           }
 
-          if (cols[1] && (cols[1].toUpperCase().includes('GOLD') || cols[1].toUpperCase().includes('SILVER'))) {
+          if (cols[1]) {
             parsedData.push({
               date: currentDate,
               metal: cols[1].trim(),
@@ -274,18 +288,17 @@
 
         if (parsedData.length > 0) {
           renderTable(parsedData);
-          document.getElementById('last-updated').textContent = 'Status: Live';
+          document.getElementById('last-updated').textContent = 'स्थिति: लाइभ';
         } else {
-          throw new Error('No valid data parsed');
+          throw new Error('No data found');
         }
       } catch (err) {
         console.error(err);
-        document.getElementById('last-updated').textContent = 'Status: Check Sheet Sharing Permissions';
+        document.getElementById('last-updated').textContent = 'स्थिति: लिङ्क जाँच गर्नुहोस्';
       }
     }
 
     loadRates();
-    // Auto refresh rate data every 30 seconds
     setInterval(loadRates, 30000);
   </script>
 </body>
