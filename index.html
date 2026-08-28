@@ -67,8 +67,6 @@
       padding: 14px 18px;
       text-align: center;
       color: var(--ink-black);
-      font-size: 1.3rem;
-      font-weight: 600;
     }
 
     .rate-table th {
@@ -77,14 +75,16 @@
       background-color: rgba(0, 0, 0, 0.04);
     }
 
+    /* Bigger & bolder date font */
     .date-cell {
-      font-weight: 700;
-      font-size: 1.25rem;
+      font-weight: 800;
+      font-size: 1.4rem;
       background-color: rgba(0, 0, 0, 0.02);
     }
 
     .metal-cell {
       font-weight: 700;
+      font-size: 1.3rem;
       text-align: left !important;
       padding-left: 20px !important;
       display: flex;
@@ -101,26 +101,25 @@
       flex-shrink: 0;
     }
 
+    /* Bigger & bolder price numbers */
     .price-cell {
-      font-weight: 800;
-      font-size: 1.4rem;
+      font-weight: 900;
+      font-size: 1.65rem;
       letter-spacing: 0.5px;
     }
 
-    /* Footer Status Bar */
+    /* Footer Status Bar (Only status left aligned) */
     .footer-bar {
       margin-top: 20px;
       display: flex;
-      justify-content: space-between;
+      justify-content: flex-end;
       align-items: center;
-      font-size: 0.95rem;
-      font-weight: 600;
-      color: #333;
       padding-top: 10px;
     }
 
     .status-tag {
       font-size: 0.85rem;
+      font-weight: 600;
       color: #444;
       background: rgba(0,0,0,0.06);
       padding: 4px 10px;
@@ -150,7 +149,6 @@
     </table>
 
     <div class="footer-bar">
-      <span>गूगल शिटबाट स्वत: अपडेट हुन्छ</span>
       <span class="status-tag" id="last-updated">स्थिति: जोड्दैछ...</span>
     </div>
   </div>
@@ -202,7 +200,6 @@
       const num = parseFloat(cleanVal);
       if (isNaN(num)) return toNepaliDigits(val);
 
-      // Formats numbers according to Nepali/South Asian system (thousands, lakhs, crores)
       const formattedNum = num.toLocaleString('ne-NP');
       return `${formattedNum}/–`;
     }
